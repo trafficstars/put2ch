@@ -2,9 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"net"
+	"net/http"
+     _ "net/http/pprof"
 
 	"github.com/trafficstars/put2ch"
 )
@@ -30,6 +33,7 @@ func newInput(reader io.ReadCloser, rowsChannel chan *put2ch.Row, inputFormat, t
 func main() {
 	var udpPort = flag.Int(`udp-port`, 5363, `UDP port to be listened (to disable: -1; default: 5363)`)
 	var tcpPort = flag.Int(`tcp-port`, 5363, `TCP port to be listened (to disable: -1; default: 5363)`)
+	var netPprofPort = flag.Int(`net-pprof-port`, 5364, `port to be used for "net/pprof" (to disable: -1; default: 5364)`)
 	var tableName = flag.String(`table-name`, `log`, `table to be inserted to (default: "log")`)
 	var inputFormat = flag.String(`input-format`, `rawjson`, `input data format (possible values: rawjson; default: "rawjson")`)
 	var dataColumnName = flag.String(`data-column-name`, `raw`, `if input format is "rawjson" then it's required to select a column to write to (default: "rawjson")`)
@@ -60,6 +64,11 @@ func main() {
 		}()
 	}
 
+	if *netPprofPort >= 0 {
+		go func() {
+			fatalIf(http.ListenAndServe(fmt.Sprintf(`:%v`, *netPprofPort), nil))
+		}()
+	}
 
 	chInserter, err := put2ch.NewCHInserter(*chDSN, rowsChannel, &logger{})
 	fatalIf(err)

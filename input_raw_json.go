@@ -2,16 +2,16 @@ package put2ch
 
 import (
 	"bytes"
-	"encoding/json"
-	"github.com/xaionaro-go/errors"
+	json "github.com/francoispqt/gojay"
 	"io"
 	"net"
 	"time"
+
+	"github.com/xaionaro-go/errors"
 )
 
 type InputRawJSON struct {
 	*json.Decoder
-	*json.Encoder
 
 	Logger Logger
 	Reader io.ReadCloser
@@ -41,14 +41,7 @@ func NewInputRawJSON(reader io.ReadCloser, OutChan chan *Row, tableName, dataCol
 	input.Columns   = []string{dateColumnName, dataColumnName}
 
 	input.Decoder = json.NewDecoder(input.Reader)
-	input.Decoder.UseNumber()
-
-	input.Encoder = json.NewEncoder(&input.encoderResult)
-
-	// This line is not required (anyway this behaviour is the default one), but just in case...
-	// ... CH requires no whitespaces outside of strings in JSONs,
-	// see: https://clickhouse.yandex/docs/en/query_language/functions/json_functions/
-	input.Encoder.SetIndent("", "")
+	//input.Decoder.UseNumber()
 
 	input.start()
 
@@ -62,7 +55,7 @@ func (l *InputRawJSON) start() {
 func (l *InputRawJSON) loop() {
 	l.isRunning = true
 	for l.isRunning {
-		msg := map[string]interface{}{}
+		msg := json.EmbeddedJSON{}
 		l.Logger.Trace(`S`)
 		err := l.Decode(&msg)
 		l.Logger.Trace(`/S`)
@@ -81,26 +74,21 @@ func (l *InputRawJSON) loop() {
 				continue
 			}
 			buf := newBuffer()
-			buf.ReadFrom(l.Decoder.Buffered())
+			//buf.ReadFrom(l.Decoder.Buffered())
 			l.Logger.Warning(errors.Wrap(err, `(*RawJSONUDPListener).loop(): unable to decode`), buf.String())
 			buf.Release()
 
 			// TODO: remove this dirty hack. It's required to find a way to just reset the decoder
 			// (instead of re-creating it)
 			l.Decoder = json.NewDecoder(l.Reader)
-			l.Decoder.UseNumber()
+			//l.Decoder.UseNumber()
 			continue
-		}
-
-		err = l.Encode(msg)
-		if err != nil {
-			l.Logger.Warning(errors.Wrap(err, `(*RawJSONUDPListener).loop(): unable to encode`))
 		}
 
 		row := NewRow()
 		row.tableName = l.TableName
 		row.columns = l.Columns
-		row.values = []interface{}{time.Now(), l.encoderResult.String()}
+		row.values = []interface{}{time.Now(), string(msg)}
 		l.Logger.Trace(`Q`)
 		l.OutChan <- row
 		l.Logger.Trace(`/Q`)
