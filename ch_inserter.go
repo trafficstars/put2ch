@@ -1,4 +1,4 @@
-package udp2ch
+package put2ch
 
 import (
 	"database/sql"
@@ -15,7 +15,7 @@ const (
 type CHInserter struct {
 	spinlock.Locker
 
-	GetRower  GetRower
+	RowsChan  chan *Row
 	Queue     Rows
 	BunchSize uint
 	LastError error
@@ -28,7 +28,7 @@ type CHInserter struct {
 type sqlStatementGeneratorCache struct {
 }
 
-func NewCHInserter(dsn string, getRower GetRower, logger Logger) (*CHInserter, error) {
+func NewCHInserter(dsn string, rowsChan chan *Row, logger Logger) (*CHInserter, error) {
 	db, err := sql.Open("clickhouse", dsn)
 	if err != nil {
 		return nil, errors.Wrap(err)
@@ -38,7 +38,7 @@ func NewCHInserter(dsn string, getRower GetRower, logger Logger) (*CHInserter, e
 	}
 	return &CHInserter{
 		DB:        db,
-		GetRower:  getRower,
+		RowsChan:  rowsChan,
 		BunchSize: defaultBunchSize,
 		Logger:    logger,
 	}, nil
@@ -54,7 +54,9 @@ func (ch *CHInserter) LogWarning(args ...interface{}) {
 
 func (ch *CHInserter) Loop() error {
 	for {
-		row := ch.GetRower.GetRow()
+		ch.Logger.Trace(`L`)
+		row := <- ch.RowsChan
+		ch.Logger.Trace(`/L`)
 
 		err := ch.PushToQueue(row)
 		if err != nil {

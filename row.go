@@ -1,4 +1,4 @@
-package udp2ch
+package put2ch
 
 import (
 	"sync"

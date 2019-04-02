@@ -1,4 +1,4 @@
-package udp2ch
+package put2ch
 
 import (
 	"github.com/xaionaro-go/errors"

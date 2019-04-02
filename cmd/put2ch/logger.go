@@ -2,6 +2,16 @@ package main
 
 import (
 	"log"
+
+	"github.com/trafficstars/put2ch"
+)
+
+const (
+	isTracingEnabled = false
+)
+
+var (
+	_ put2ch.Logger = &logger{}
 )
 
 type logger struct{
@@ -17,4 +27,11 @@ func (l *logger) Warning(args ...interface{}) {
 		log.Print(`[warning] `, args)
 	}
 	l.warnCounter++
+}
+
+func (l *logger) Trace(args ...interface{}) {
+	if !isTracingEnabled {
+		return
+	}
+	log.Print(`[trace]`, args)
 }
