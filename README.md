@@ -12,6 +12,6 @@ KiB Swap:        0 total,        0 free,        0 used. 13465716 avail Mem
 
   PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND                                                                                                  
  8852 clickho+  20   0 11.203g 982.4m  30876 S   2.8  6.2  49:51.36 clickhouse-serv                                                                                          
-30743 xaionaro  20   0 2795144 1.083g   8688 S   0.2  7.0   0:16.28 logger                                                                                                   
+30743 xaionaro  20   0 2795144 1.083g   8688 S   0.2  7.0   0:16.28 put2ch                                                                                                   
  5525 zabbix    20   0  101596   1176    100 S   0.1  0.0 189:04.67 zabbix_agentd                                                                                            
 ```
