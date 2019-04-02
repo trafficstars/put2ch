@@ -55,7 +55,7 @@ func (ch *CHInserter) LogWarning(args ...interface{}) {
 func (ch *CHInserter) Loop() error {
 	for {
 		ch.Logger.Trace(`L`)
-		row := <- ch.RowsChan
+		row := <-ch.RowsChan
 		ch.Logger.Trace(`/L`)
 
 		err := ch.PushToQueue(row)

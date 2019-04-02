@@ -7,11 +7,10 @@ type Logger interface {
 }
 
 type dummyLoggerT struct {
-
 }
 
 var dummyLogger Logger = &dummyLoggerT{}
 
-func (l *dummyLoggerT) Error(...interface{}) {}
+func (l *dummyLoggerT) Error(...interface{})   {}
 func (l *dummyLoggerT) Warning(...interface{}) {}
-func (l *dummyLoggerT) Trace(...interface{}) {}
+func (l *dummyLoggerT) Trace(...interface{})   {}

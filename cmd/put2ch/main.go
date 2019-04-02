@@ -7,7 +7,8 @@ import (
 	"log"
 	"net"
 	"net/http"
-     _ "net/http/pprof"
+	_ "net/http/pprof"
+	"runtime/debug"
 
 	"github.com/trafficstars/put2ch"
 )
@@ -40,6 +41,8 @@ func main() {
 	var dateColumnName = flag.String(`date-column-name`, `received_at`, `if input format is "rawjson" then it's required to select a column to be used for log receive dates (default: "received_at")`)
 	var chDSN = flag.String(`ch-dsn`, `tcp://127.0.0.1:9000`, `DSN for the ClickHouse connection (default: "tcp://127.0.0.1:9000")`)
 	flag.Parse()
+
+	debug.SetGCPercent(5)
 
 	rowsChannel := make(chan *put2ch.Row, 128)
 

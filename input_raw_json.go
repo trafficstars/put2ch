@@ -1,7 +1,6 @@
 package put2ch
 
 import (
-	"bytes"
 	json "github.com/francoispqt/gojay"
 	"io"
 	"net"
@@ -15,9 +14,7 @@ type InputRawJSON struct {
 
 	Logger Logger
 	Reader io.ReadCloser
-	
-	encoderResult bytes.Buffer
-	
+
 	TableName string
 	Columns   []string
 
@@ -28,7 +25,7 @@ type InputRawJSON struct {
 
 func NewInputRawJSON(reader io.ReadCloser, OutChan chan *Row, tableName, dataColumnName, dateColumnName string, logger Logger) *InputRawJSON {
 	input := &InputRawJSON{}
-	
+
 	if logger == nil {
 		logger = dummyLogger
 	}
@@ -36,9 +33,9 @@ func NewInputRawJSON(reader io.ReadCloser, OutChan chan *Row, tableName, dataCol
 
 	input.OutChan = OutChan
 
-	input.Reader = reader 
+	input.Reader = reader
 	input.TableName = tableName
-	input.Columns   = []string{dateColumnName, dataColumnName}
+	input.Columns = []string{dateColumnName, dataColumnName}
 
 	input.Decoder = json.NewDecoder(input.Reader)
 	//input.Decoder.UseNumber()
@@ -53,9 +50,10 @@ func (l *InputRawJSON) start() {
 }
 
 func (l *InputRawJSON) loop() {
+	msg := json.EmbeddedJSON{}
 	l.isRunning = true
 	for l.isRunning {
-		msg := json.EmbeddedJSON{}
+		msg = msg[:0]
 		l.Logger.Trace(`S`)
 		err := l.Decode(&msg)
 		l.Logger.Trace(`/S`)
@@ -74,14 +72,13 @@ func (l *InputRawJSON) loop() {
 				continue
 			}
 			buf := newBuffer()
-			//buf.ReadFrom(l.Decoder.Buffered())
+			//buf.ReadFrom(l.Decoder.Buffered()) // TODO: implement the method "Buffered()" within "gojay"
 			l.Logger.Warning(errors.Wrap(err, `(*RawJSONUDPListener).loop(): unable to decode`), buf.String())
 			buf.Release()
 
 			// TODO: remove this dirty hack. It's required to find a way to just reset the decoder
 			// (instead of re-creating it)
 			l.Decoder = json.NewDecoder(l.Reader)
-			//l.Decoder.UseNumber()
 			continue
 		}
 
@@ -92,8 +89,6 @@ func (l *InputRawJSON) loop() {
 		l.Logger.Trace(`Q`)
 		l.OutChan <- row
 		l.Logger.Trace(`/Q`)
-
-		l.encoderResult.Reset()
 	}
 }
 

@@ -14,7 +14,7 @@ var (
 	_ put2ch.Logger = &logger{}
 )
 
-type logger struct{
+type logger struct {
 	warnCounter int
 }
 
@@ -23,7 +23,7 @@ func (l *logger) Error(args ...interface{}) {
 }
 
 func (l *logger) Warning(args ...interface{}) {
-	if l.warnCounter % 1000 == 0 {
+	if l.warnCounter%1000 == 0 {
 		log.Print(`[warning] `, args)
 	}
 	l.warnCounter++
