@@ -4,7 +4,7 @@ for logging.
 go run ./cmd/put2ch/ -ch-dsn 'tcp://127.0.0.1:9000/?database=log' -table-name rows
 ```
 
-On 3 KRPS:
+On 3 KRPS (while CH merging process):
 ```
 Tasks: 194 total,   1 running, 193 sleeping,   0 stopped,   0 zombie
 %Cpu(s): 11.2 us,  0.8 sy,  0.0 ni, 86.3 id,  1.7 wa,  0.0 hi,  0.0 si,  0.0 st
