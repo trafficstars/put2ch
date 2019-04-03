@@ -29,9 +29,13 @@ func (l *logger) Warning(args ...interface{}) {
 	l.warnCounter++
 }
 
+func (l *logger) Info(args ...interface{}) {
+	log.Print(`[info] `, args)
+}
+
 func (l *logger) Trace(args ...interface{}) {
 	if !isTracingEnabled {
 		return
 	}
-	log.Print(`[trace]`, args)
+	log.Print(`[trace] `, args)
 }

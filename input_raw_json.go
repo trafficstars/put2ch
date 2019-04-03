@@ -72,7 +72,7 @@ func (l *InputRawJSON) loop() {
 			}
 			buf := newBuffer()
 			buf.ReadFrom(decoder.Buffered()) // TODO: implement the method "Buffered()" within "gojay"
-			l.Logger.Warning(errors.Wrap(err, `(*RawJSONUDPListener).loop(): unable to decode`), buf.String())
+			l.Logger.Warning(errors.Wrap(err, `(*InputRawJSON).loop(): unable to decode`), buf.String())
 			buf.Release()
 
 			// TODO: remove this dirty hack. It's required to find a way to just reset the decoder

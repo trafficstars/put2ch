@@ -54,3 +54,17 @@ func (row *Row) GetColumn() []string {
 func (row *Row) GetValues() []interface{} {
 	return row.values
 }
+
+func (row *Row) GetValuesForTable(tableStructure *tableStructure) (result []interface{}) {
+	for _, column := range tableStructure.Columns {
+		var v interface{}
+		for idx, rowColumnName := range row.columns {
+			if rowColumnName == column.Name {
+				v = row.values[idx]
+				break
+			}
+		}
+		result = append(result, v)
+	}
+	return
+}
